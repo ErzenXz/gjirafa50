@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>xen50 • Authenticate</title>
+      <link rel="stylesheet" href="style.css" />
+      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+      <script
+         src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-auth.min.js"
+         integrity="sha512-GAEvFso2oksY5JFkHlrfLhZgAV6aL48qxnbxPnbKnNLeG/XsU/c0lh/g9gocZ2RtbRx6VDTqspPEy9ixWvbfzw=="
+         crossorigin="anonymous"
+         referrerpolicy="no-referrer"
+         defer
+      ></script>
+
+      <script
+         src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-firestore.min.js"
+         integrity="sha512-95HhZKEWw0vxywbO/5CJhf+KJqEDEmXGDeys3ylTMTuW50ccC26GcV7pPhTiYC8fH3jj0i4AwxRdIN5vfoLqmg=="
+         crossorigin="anonymous"
+         referrerpolicy="no-referrer"
+         defer
+      ></script>
+   </head>
+
+   <body>
+      <section class="container forms">
+         <form action="#" id="loginS">
+            <div class="form login">
+               <div class="form-content">
+                  <header>Login</header>
+                  <div class="field input-field">
+                     <input
+                        type="email"
+                        autocomplete="email"
+                        placeholder="Email"
+                        class="input"
+                        id="email"
+                     />
+                  </div>
+
+                  <div class="field input-field">
+                     <input
+                        type="password"
+                        autocomplete="current-password"
+                        placeholder="Password"
+                        class="password"
+                        id="password"
+                     />
+                     <i class="bx bx-hide eye-icon"></i>
+                  </div>
+
+                  <div class="field cloudflare" id="cf1">
+                     <br />
+                     <div
+                        class="cf-turnstile"
+                        data-sitekey="0x4AAAAAAARhH3-gi_zdnkqI"
+                        data-callback="javascriptCallback"
+                        id="cf1-1"
+                     ></div>
+                  </div>
+                  <br />
+                  <br />
+
+                  <div class="field button-field">
+                     <button type="submit" id="loginButton">Login</button>
+                  </div>
+
+                  <div class="form-link">
+                     <div>
+                        Don't have an account?
+                        <a href="#" class="link signup-link">Signup</a>
+                        <a href="#forgot" class="forgot-pass" onclick="forgotPassword()"
+                           >Forgot password?</a
+                        >
+                     </div>
+                     <br />
+                     <div>
+                        <a href="#anonymous" class="link" onclick="loginAnonymously()"
+                           >Login as Anonymous</a
+                        >
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </form>
+
+         <form action="#signupCallback" id="signupS">
+            <div class="form signup">
+               <div class="form-content">
+                  <header>Signup</header>
+
+                  <div class="field input-field">
+                     <input
+                        type="text"
+                        placeholder="Full Name"
+                        autocomplete="name"
+                        class="input"
+                        id="name"
+                     />
+                  </div>
+
+                  <div class="field input-field">
+                     <input
+                        type="text"
+                        placeholder="Username"
+                        autocomplete="username"
+                        class="input"
+                        id="username"
+                     />
+                  </div>
+
+                  <div class="field input-field">
+                     <input
+                        type="email"
+                        placeholder="Email"
+                        autocomplete="off"
+                        class="input"
+                        id="email-r"
+                     />
+                  </div>
+
+                  <div class="field input-field">
+                     <input
+                        type="password"
+                        placeholder="Password"
+                        autocomplete="new-password"
+                        class="password"
+                        id="password-r"
+                     />
+                  </div>
+
+                  <div class="field input-field">
+                     <input
+                        type="password"
+                        placeholder="Confirm password"
+                        autocomplete="new-password"
+                        class="password"
+                        id="password-2r"
+                     />
+                     <i class="bx bx-hide eye-icon"></i>
+                  </div>
+
+                  <div class="field input-field">
+                     <input
+                        type="tel"
+                        placeholder="Phone Number"
+                        autocomplete="tel"
+                        class="input"
+                        id="phone"
+                     />
+                     <i class="bx bx-hide eye-icon"></i>
+                  </div>
+
+                  <div class="field cloudflare" id="cf2">
+                     <br />
+                     <div
+                        class="cf-turnstile"
+                        data-sitekey="0x4AAAAAAARhH3-gi_zdnkqI"
+                        data-callback="javascriptCallback"
+                        id="cf1-2"
+                     ></div>
+                  </div>
+                  <br />
+                  <br />
+                  <div class="field button-field">
+                     <button onclick="signup()">Signup</button>
+                  </div>
+
+                  <div class="form-link">
+                     <span
+                        >Already have an account?
+                        <a href="#" class="link login-link">Login</a></span
+                     >
+                  </div>
+               </div>
+            </div>
+         </form>
+      </section>
+
+      <script
+         src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-app.min.js"
+         integrity="sha512-Gvs2fg+wkNjydmkwgHwwTkuWlr9Gz0hTjFwJ4InwYwbAA3rtL2kBIHt7YRfwVCdW77QF2Ne2DdHQVCcULM89ig=="
+         crossorigin="anonymous"
+         referrerpolicy="no-referrer"
+      ></script>
+      <script defer src="app.js"></script>
+
+      <script>
+         const firebaseConfig = {
+            apiKey: "AIzaSyBikfDUXZu0yRmfrOPEXWgQ0fb77jZe4f4",
+            authDomain: "gjirafa50-f45d8.firebaseapp.com",
+            databaseURL: "https://gjirafa50-f45d8-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "gjirafa50-f45d8",
+            storageBucket: "gjirafa50-f45d8.appspot.com",
+            messagingSenderId: "470691065240",
+            appId: "1:470691065240:web:e8eb6b827707b5be98cfed",
+            measurementId: "G-PKVM99DBS5",
+         };
+
+         firebase.initializeApp(firebaseConfig);
+      </script>
+   </body>
+</html>
