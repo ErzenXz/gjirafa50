@@ -92,187 +92,6 @@ firebase.auth().onAuthStateChanged(function (user) {
 
       let cartTotalElement = document.getElementById("numberCart");
 
-      // Get all special images from the database
-
-      let savedSpecialImages = localStorage.getItem("specialImages");
-      let savedSpecialImagesTime = localStorage.getItem("specialImagesTime");
-
-      if (
-         savedSpecialImages &&
-         savedSpecialImagesTime &&
-         new Date().getTime() - savedSpecialImagesTime < 1800000
-      ) {
-         let specialImagesList = Object.values(JSON.parse(savedSpecialImages));
-
-         let specialImagesElement = document.getElementById("slides");
-
-         specialImagesElement.innerHTML = "";
-
-         let added = 0;
-
-         for (let i = 0; i < specialImagesList.length; i++) {
-            let specialImage = specialImagesList[i];
-
-            let html = `
-            <div class="imageSlider__slide">
-               <img
-                  src="${specialImage.image}"
-                  alt="Slider Image ${i + 1}"
-               />
-            </div>`;
-
-            let startDate = new Date(specialImage.startDate);
-            let endDate = new Date(specialImage.endDate);
-
-            let currentDate = new Date().getTime();
-
-            if (currentDate >= startDate && currentDate <= endDate) {
-               specialImagesElement.innerHTML += html;
-               added++;
-            } else {
-               //
-            }
-
-            if (added === 0) {
-               let html = `
-               <div class="imageSlider__slide">
-                  <img
-                     src="https://iqq6kf0xmf.gjirafa.net/images/1a590909-12b8-4f44-b8d5-379ea21b4aff/1a590909-12b8-4f44-b8d5-379ea21b4aff.jpeg?w=1920"
-                     alt="Slider Image ${i + 1}"
-                  />
-               </div>`;
-               specialImagesElement.innerHTML += html;
-               added++;
-            }
-         }
-         document.getElementById("totalSlides").textContent = added;
-
-         console.log(
-            "Loaded special images from local storage. Will update in " +
-               (1800000 - (new Date().getTime() - savedSpecialImagesTime)) +
-               " milliseconds."
-         );
-
-         slides = document.querySelectorAll(".imageSlider__slide"); // Update the slides array with current slide elements
-      } else {
-         specialImages.on("value", function (snapshot) {
-            let specialImagesList = snapshot.val();
-            let specialImagesKeys = Object.keys(specialImagesList) || [];
-
-            let specialImagesElement = document.getElementById("slides");
-
-            specialImagesElement.innerHTML = "";
-
-            for (let i = 0; i < specialImagesKeys.length; i++) {
-               let specialImageKey = specialImagesKeys[i];
-               let specialImage = specialImagesList[specialImageKey];
-
-               let html = `
-            <div class="imageSlider__slide">
-            <img
-                  src="${specialImage.image}"
-                  alt="Slider Image ${i + 1}"
-               />
-               </div>`;
-
-               specialImagesElement.innerHTML += html;
-               document.getElementById("totalSlides").textContent = specialImagesKeys.length;
-            }
-
-            slides = document.querySelectorAll(".imageSlider__slide"); // Update the slides array with current slide elements
-
-            // Save the special images to local storage for 30 minutes
-
-            localStorage.setItem("specialImages", JSON.stringify(specialImagesList));
-            localStorage.setItem("specialImagesTime", new Date().getTime());
-         });
-      }
-      // Get all the categories from the database
-
-      let savedCategories = localStorage.getItem("categories");
-      let savedCategoriesTime = localStorage.getItem("categoriesTime");
-
-      if (
-         savedCategories &&
-         savedCategoriesTime &&
-         new Date().getTime() - savedCategoriesTime < 1800000
-      ) {
-         let categoryList = Object.values(JSON.parse(savedCategories));
-
-         let categoryElement = document.getElementById("categories");
-
-         categoryElement.innerHTML = "";
-
-         for (let i = 0; i < categoryList.length; i++) {
-            let category = categoryList[i];
-
-            let categoryItem = document.createElement("div");
-            categoryItem.className = "item";
-            categoryItem.addEventListener("click", function (event) {
-               event.preventDefault();
-               location.href = "browse?category=" + category.url;
-            });
-
-            let categoryImage = document.createElement("img");
-            categoryImage.src = category.image;
-            categoryImage.alt = category.name;
-
-            let categoryTitle = document.createElement("h3");
-            categoryTitle.textContent = category.name;
-
-            categoryItem.appendChild(categoryImage);
-            categoryItem.appendChild(categoryTitle);
-
-            categoryElement.appendChild(categoryItem);
-         }
-
-         console.log(
-            "Loaded categories from local storage. Will update in " +
-               (1800000 - (new Date().getTime() - savedCategoriesTime)) +
-               " milliseconds."
-         );
-      } else {
-         categories.on("value", function (snapshot) {
-            let categoryList = snapshot.val();
-            let categoryKeys = Object.keys(categoryList);
-
-            console.log(categoryList);
-
-            let categoryElement = document.getElementById("categories");
-
-            categoryElement.innerHTML = "";
-
-            for (let i = 0; i < categoryKeys.length; i++) {
-               let categoryKey = categoryKeys[i];
-               let category = categoryList[categoryKey];
-
-               let categoryItem = document.createElement("div");
-               categoryItem.className = "item";
-               categoryItem.addEventListener("click", function (event) {
-                  event.preventDefault();
-                  location.href = "browse?category=" + category.url;
-               });
-
-               let categoryImage = document.createElement("img");
-               categoryImage.src = category.image;
-               categoryImage.alt = category.name;
-
-               let categoryTitle = document.createElement("h3");
-               categoryTitle.textContent = category.name;
-
-               categoryItem.appendChild(categoryImage);
-               categoryItem.appendChild(categoryTitle);
-
-               categoryElement.appendChild(categoryItem);
-            }
-
-            // Save the categories to local storage for 30 minutes
-
-            localStorage.setItem("categories", JSON.stringify(categoryList));
-            localStorage.setItem("categoriesTime", new Date().getTime());
-         });
-      }
-
       // Get all the products in the cart from the database
 
       cart.on("value", function (snapshot) {
@@ -304,10 +123,234 @@ firebase.auth().onAuthStateChanged(function (user) {
          }
       });
    } else {
+      let randomIndetifier =
+         Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+      userID = localStorage.getItem("userID") || randomIndetifier;
+
+      if (!localStorage.getItem("userID")) {
+         localStorage.setItem("userID", userID);
+      }
+
       // No user is signed in.
-      console.log("No user is signed in.");
+      console.log("No user is signed in. " + userID);
+
+      let cart = database.ref("cart/" + userID);
+      let cartTotalElement = document.getElementById("numberCart");
+
+      // Get all the products in the cart from the database
+
+      cart.on("value", function (snapshot) {
+         let cartList = snapshot.val();
+         let cartKeys = cartList ? Object.keys(cartList) : [];
+
+         cartItems = [];
+         cartTotal = 0;
+
+         for (let i = 0; i < cartKeys.length; i++) {
+            let cartKey = cartKeys[i];
+            let cartItem = cartList[cartKey];
+
+            cartItems.push(cartItem);
+
+            let product = products.child(cartItem.product);
+
+            product.once("value", function (snapshot) {
+               let productData = snapshot.val();
+
+               let price = Number(
+                  productData.price - (productData.price * productData.discount) / 100
+               ).toFixed(2);
+
+               cartTotal += price * cartItem.quantity;
+
+               cartTotalElement.textContent = cartTotal.toFixed(2) + " €";
+            });
+         }
+      });
    }
 });
+
+// Get all special images from the database
+
+let savedSpecialImages = localStorage.getItem("specialImages");
+let savedSpecialImagesTime = localStorage.getItem("specialImagesTime");
+
+if (
+   savedSpecialImages &&
+   savedSpecialImagesTime &&
+   new Date().getTime() - savedSpecialImagesTime < 1800000
+) {
+   let specialImagesList = Object.values(JSON.parse(savedSpecialImages));
+
+   let specialImagesElement = document.getElementById("slides");
+
+   specialImagesElement.innerHTML = "";
+
+   let added = 0;
+
+   for (let i = 0; i < specialImagesList.length; i++) {
+      let specialImage = specialImagesList[i];
+
+      let html = `
+      <div class="imageSlider__slide">
+         <img
+            src="${specialImage.image}"
+            alt="Slider Image ${i + 1}"
+         />
+      </div>`;
+
+      let startDate = new Date(specialImage.startDate);
+      let endDate = new Date(specialImage.endDate);
+
+      let currentDate = new Date().getTime();
+
+      if (currentDate >= startDate && currentDate <= endDate) {
+         specialImagesElement.innerHTML += html;
+         added++;
+      } else {
+         //
+      }
+
+      if (added === 0) {
+         let html = `
+         <div class="imageSlider__slide">
+            <img
+               src="https://iqq6kf0xmf.gjirafa.net/images/1a590909-12b8-4f44-b8d5-379ea21b4aff/1a590909-12b8-4f44-b8d5-379ea21b4aff.jpeg?w=1920"
+               alt="Slider Image ${i + 1}"
+            />
+         </div>`;
+         specialImagesElement.innerHTML += html;
+         added++;
+      }
+   }
+   document.getElementById("totalSlides").textContent = added;
+
+   console.log(
+      "Loaded special images from local storage. Will update in " +
+         (1800000 - (new Date().getTime() - savedSpecialImagesTime)) +
+         " milliseconds."
+   );
+
+   slides = document.querySelectorAll(".imageSlider__slide"); // Update the slides array with current slide elements
+} else {
+   specialImages.on("value", function (snapshot) {
+      let specialImagesList = snapshot.val();
+      let specialImagesKeys = Object.keys(specialImagesList) || [];
+
+      let specialImagesElement = document.getElementById("slides");
+
+      specialImagesElement.innerHTML = "";
+
+      for (let i = 0; i < specialImagesKeys.length; i++) {
+         let specialImageKey = specialImagesKeys[i];
+         let specialImage = specialImagesList[specialImageKey];
+
+         let html = `
+      <div class="imageSlider__slide">
+      <img
+            src="${specialImage.image}"
+            alt="Slider Image ${i + 1}"
+         />
+         </div>`;
+
+         specialImagesElement.innerHTML += html;
+         document.getElementById("totalSlides").textContent = specialImagesKeys.length;
+      }
+
+      slides = document.querySelectorAll(".imageSlider__slide"); // Update the slides array with current slide elements
+
+      // Save the special images to local storage for 30 minutes
+
+      localStorage.setItem("specialImages", JSON.stringify(specialImagesList));
+      localStorage.setItem("specialImagesTime", new Date().getTime());
+   });
+}
+// Get all the categories from the database
+
+let savedCategories = localStorage.getItem("categories");
+let savedCategoriesTime = localStorage.getItem("categoriesTime");
+
+if (
+   savedCategories &&
+   savedCategoriesTime &&
+   new Date().getTime() - savedCategoriesTime < 1800000
+) {
+   let categoryList = Object.values(JSON.parse(savedCategories));
+
+   let categoryElement = document.getElementById("categories");
+
+   categoryElement.innerHTML = "";
+
+   for (let i = 0; i < categoryList.length; i++) {
+      let category = categoryList[i];
+
+      let categoryItem = document.createElement("div");
+      categoryItem.className = "item";
+      categoryItem.addEventListener("click", function (event) {
+         event.preventDefault();
+         location.href = "browse?category=" + category.url;
+      });
+
+      let categoryImage = document.createElement("img");
+      categoryImage.src = category.image;
+      categoryImage.alt = category.name;
+
+      let categoryTitle = document.createElement("h3");
+      categoryTitle.textContent = category.name;
+
+      categoryItem.appendChild(categoryImage);
+      categoryItem.appendChild(categoryTitle);
+
+      categoryElement.appendChild(categoryItem);
+   }
+
+   console.log(
+      "Loaded categories from local storage. Will update in " +
+         (1800000 - (new Date().getTime() - savedCategoriesTime)) +
+         " milliseconds."
+   );
+} else {
+   categories.on("value", function (snapshot) {
+      let categoryList = snapshot.val();
+      let categoryKeys = Object.keys(categoryList);
+
+      console.log(categoryList);
+
+      let categoryElement = document.getElementById("categories");
+
+      categoryElement.innerHTML = "";
+
+      for (let i = 0; i < categoryKeys.length; i++) {
+         let categoryKey = categoryKeys[i];
+         let category = categoryList[categoryKey];
+
+         let categoryItem = document.createElement("div");
+         categoryItem.className = "item";
+         categoryItem.addEventListener("click", function (event) {
+            event.preventDefault();
+            location.href = "browse?category=" + category.url;
+         });
+
+         let categoryImage = document.createElement("img");
+         categoryImage.src = category.image;
+         categoryImage.alt = category.name;
+
+         let categoryTitle = document.createElement("h3");
+         categoryTitle.textContent = category.name;
+
+         categoryItem.appendChild(categoryImage);
+         categoryItem.appendChild(categoryTitle);
+
+         categoryElement.appendChild(categoryItem);
+      }
+
+      // Save the categories to local storage for 30 minutes
+
+      localStorage.setItem("categories", JSON.stringify(categoryList));
+      localStorage.setItem("categoriesTime", new Date().getTime());
+   });
+}
 
 // Get the last 30 products from the database, if user clicks on the "View More" button, get the next 30 products
 

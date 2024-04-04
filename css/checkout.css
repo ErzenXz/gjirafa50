@@ -35,6 +35,33 @@
     border: 1px solid var(--border);
 }
 
+.cart-item h3 {
+    width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cart-item button {
+    background-color: var(--btn3);
+    border: none;
+    color: var(--textB);
+    padding: 4px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.cart-item button:hover {
+    background-color: var(--btn-hover3);
+    color: var(--text);
+}
+
+.cart-item button:nth-last-child(1) {
+    background-color: rgb(240, 121, 23);
+    color: white;
+}
+
 .cart__footer {
     width: 100%;
     display: flex;

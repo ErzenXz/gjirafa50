@@ -32,6 +32,10 @@ firebase.auth().onAuthStateChanged(function (user) {
          cartItems = [];
          cartTotal = 0;
 
+         let mainDiv = document.getElementById("cartItems");
+
+         mainDiv.innerHTML = "";
+
          for (let i = 0; i < cartKeys.length; i++) {
             let cartKey = cartKeys[i];
             let cartItem = cartList[cartKey];
@@ -54,10 +58,6 @@ firebase.auth().onAuthStateChanged(function (user) {
                cartTotalVALUE.textContent = cartTotal.toFixed(2) + " €";
 
                // Put all the cart items in the cart list
-
-               let mainDiv = document.getElementById("cartItems");
-
-               mainDiv.innerHTML = "";
 
                let cartItemDiv = document.createElement("div");
                cartItemDiv.className = "cart-item";
@@ -123,9 +123,121 @@ firebase.auth().onAuthStateChanged(function (user) {
          document.getElementById("zip").value = zip;
       }
    } else {
-      userID = null;
-      userEmail = null;
-      document.getElementById("account").style.display = "block";
+      let randomIndetifier =
+         Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+      userID = localStorage.getItem("userID") || randomIndetifier;
+
+      if (!localStorage.getItem("userID")) {
+         localStorage.setItem("userID", userID);
+      }
+
+      let cartTotalVALUE = document.getElementById("cartTotal");
+      let cart = database.ref("cart/" + userID);
+
+      cart.on("value", function (snapshot) {
+         let cartList = snapshot.val();
+         let cartKeys = cartList ? Object.keys(cartList) : [];
+
+         if (cartKeys.length === 0) {
+            document.getElementById("cartItems").innerHTML =
+               "<h2 style='text-align: center; margin-top: 2rem;'>Shporta juaj është e zbrazët.</h2>";
+            cartTotalVALUE.textContent = "0.00 €";
+
+            document.querySelector(".porosit__button").classList.add("hidden");
+         }
+
+         cartItems = [];
+         cartTotal = 0;
+
+         let mainDiv = document.getElementById("cartItems");
+
+         mainDiv.innerHTML = "";
+
+         for (let i = 0; i < cartKeys.length; i++) {
+            let cartKey = cartKeys[i];
+            let cartItem = cartList[cartKey];
+
+            cartItems.push(cartItem);
+
+            let product = products.child(cartItem.product);
+
+            product.once("value", function (snapshot) {
+               let productData = snapshot.val();
+
+               let price = Number(
+                  productData.price - (productData.price * productData.discount) / 100
+               ).toFixed(2);
+
+               cartTotal += price * cartItem.quantity;
+
+               cartTotalVALUE.textContent = cartTotal.toFixed(2) + " €";
+
+               // Put all the cart items in the cart list
+
+               let cartItemDiv = document.createElement("div");
+               cartItemDiv.className = "cart-item";
+
+               let cartItemName = document.createElement("h3");
+               cartItemName.textContent = productData.name;
+               cartItemName.style.cursor = "pointer";
+               cartItemName.addEventListener("click", function (event) {
+                  location.href = "product?product=" + cartItem.product;
+               });
+
+               let cartItemPrice = document.createElement("span");
+               cartItemPrice.textContent = price + " €";
+
+               let cartItemQuantity = document.createElement("span");
+               cartItemQuantity.textContent = cartItem.quantity + "x";
+
+               let cartItemRemove = document.createElement("button");
+               cartItemRemove.textContent = "Fshij";
+               cartItemRemove.addEventListener("click", function (event) {
+                  removeFromCart(cartKey);
+               });
+
+               let add1More = document.createElement("button");
+               add1More.textContent = "+";
+               add1More.addEventListener("click", function (event) {
+                  cartItem.quantity++;
+                  cart.child(cartKey).set(cartItem);
+               });
+
+               let remove1 = document.createElement("button");
+               remove1.textContent = "-";
+               remove1.addEventListener("click", function (event) {
+                  if (cartItem.quantity > 1) {
+                     cartItem.quantity--;
+                     cart.child(cartKey).set(cartItem);
+                  }
+               });
+
+               cartItemDiv.appendChild(cartItemName);
+               cartItemDiv.appendChild(cartItemPrice);
+               cartItemDiv.appendChild(cartItemQuantity);
+               cartItemDiv.appendChild(add1More);
+               cartItemDiv.appendChild(remove1);
+               cartItemDiv.appendChild(cartItemRemove);
+
+               mainDiv.appendChild(cartItemDiv);
+            });
+         }
+      });
+
+      // Get the address from the local storage if it exists
+
+      let address = localStorage.getItem("address");
+      let city = localStorage.getItem("city");
+      let phone = localStorage.getItem("phone");
+      let zip = localStorage.getItem("zip");
+
+      if (address && city && phone && zip) {
+         document.getElementById("address").value = address;
+         document.getElementById("city").value = city;
+         document.getElementById("phone").value = phone;
+         document.getElementById("zip").value = zip;
+      }
    }
 });
 
@@ -443,6 +555,8 @@ function saveAddress() {
    toast("Adresa u ruajt me sukses.");
 }
 
+let ALL_PRODUCTS = [];
+
 function checkoutCart() {
    if (!userID) {
       toast("Ju lutem kyçuni ose regjistrohuni për të bërë blerjen.");
@@ -526,7 +640,10 @@ function checkoutCart() {
                         price: price,
                      };
 
+                     let orderID = orderKey;
                      orderItems.push(orderItem);
+
+                     ALL_PRODUCTS.push(productData);
 
                      if (orderItems.length === cartKeys.length) {
                         let orderItemsRef = database.ref("orderItems/" + orderKey);
@@ -534,9 +651,59 @@ function checkoutCart() {
                         orderItemsRef.set(orderItems).then(() => {
                            cart.remove().then(() => {
                               toast("Porosia u pranua me sukses.");
-                              document.getElementById("numberCart").textContent = "0.00 €";
-                              document.getElementById("cartTotalPrice").textContent = "0.00 €";
-                              document.getElementById("cartItems").innerHTML = "";
+
+                              let textDocument = `POSHTE DETAJET E POROSISE:
+                              Adresa: ${address}
+                              Qyteti: ${city}
+                              Numri i telefonit: ${phone}
+                              Kodi postar: ${zip}
+                              Totali: ${cartTotal} €
+                              Orari i porosise: ${new Date().toLocaleString()}
+                              Order ID: ${orderID}
+                              Produktet: `;
+                              let productNames = [];
+                              let productPrices = [];
+                              let productQuantities = [];
+                              let productTotal = [];
+                              let productTotalPrice = 0;
+                              for (let i = 0; i < ALL_PRODUCTS.length; i++) {
+                                 productNames.push(ALL_PRODUCTS[i].name);
+                                 productPrices.push(ALL_PRODUCTS[i].price);
+                                 productQuantities.push(orderItems[i].quantity);
+                                 productTotal.push(
+                                    Number(
+                                       ALL_PRODUCTS[i].price -
+                                          (ALL_PRODUCTS[i].price * ALL_PRODUCTS[i].discount) / 100
+                                    ).toFixed(2)
+                                 );
+                                 productTotalPrice += productTotal[i] * productQuantities[i];
+                              }
+
+                              for (let i = 0; i < productNames.length; i++) {
+                                 textDocument += `
+                                 Produkti: ${productNames[i]}
+                                 Sasia: ${productQuantities[i]}
+                                 Cmimi: ${productTotal[i]} €
+                                 `;
+                              }
+
+                              textDocument += `
+                              Totali i porosise: ${productTotalPrice} €
+                              Kodin e dhurates: ${giftCard}
+                              `;
+                              let orderDetails = database.ref("orderDetails/" + orderKey);
+                              orderDetails.set(textDocument);
+
+                              // Download the order details as a text file
+                              let downloadLink = document.createElement("a");
+                              downloadLink.href =
+                                 "data:text/plain;charset=utf-8," +
+                                 encodeURIComponent(textDocument);
+                              downloadLink.download = `order-${orderID}.txt`;
+                              downloadLink.click();
+
+                              // Clear the gift card input
+                              document.getElementById("giftCard").value = "";
                            });
                         });
                      }
