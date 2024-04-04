@@ -6,7 +6,9 @@ firebase.auth().onAuthStateChanged((user) => {
    } else {
       console.log("User is not logged in!");
 
-      document.getElementById("account").innerHTML = `<i class="fa-solid fa-user"></i>`;
+      document.getElementById(
+         "account"
+      ).innerHTML = `<i class="fa-solid fa-right-to-bracket" onclick="goLogin()"></i>`;
    }
 });
 
@@ -28,4 +30,8 @@ function logOut() {
       .catch((error) => {
          toast(error.message);
       });
+}
+
+function goLogin() {
+   location.href = "./account/index.html";
 }
