@@ -20,7 +20,7 @@ function getStats() {
             document.getElementById("postsN").innerText = data.products;
             document.getElementById("commentsN").innerText = data.activeOrders;
             document.getElementById("sharesN").innerText = data.totalOrders;
-            document.getElementById("visitsN").innerText = data.returns;
+            document.getElementById("visitsN").innerText = data.visits;
          } else {
             console.log("Error: No such document!");
          }
