@@ -511,7 +511,10 @@ function checkoutCart() {
                   product.once("value", function (snapshot) {
                      let productData = snapshot.val();
 
-                     let superDiscount = Math.max(productData.discount || 0, giftCardData.percent);
+                     let superDiscount = Math.max(
+                        productData.discount || 0,
+                        giftCardData.percent || 0
+                     );
 
                      let price = Number(
                         productData.price - (productData.price * superDiscount) / 100
@@ -584,7 +587,7 @@ function checkoutCart() {
                      let productData = snapshot.val();
 
                      let price = Number(
-                        productData.price - (productData.price * productData.discount) / 100
+                        productData.price - (productData.price * (productData.discount || 0)) / 100
                      ).toFixed(2);
 
                      let orderItem = {
