@@ -6,7 +6,7 @@ firebase.auth().onAuthStateChanged((user) => {
    } else {
       console.log("User is not logged in!");
 
-      location.href = "../account/index.html";
+      document.getElementById("account").innerHTML = `<i class="fa-solid fa-user"></i>`;
    }
 });
 
