@@ -771,6 +771,8 @@ function checkoutCart() {
                         orderItemsRef.set(orderItems).then(() => {
                            cart.remove().then(() => {
                               toast("Porosia u pranua me sukses.");
+                              addProductF("activeOrders");
+                              addProductF("totalOrders");
                               document.getElementById("numberCart").textContent = "0.00 €";
                               document.getElementById("cartTotalPrice").textContent = "0.00 €";
                               document.getElementById("cartItems").innerHTML = "";
@@ -806,5 +808,21 @@ function giftCard() {
       } else {
          toast("Kodi i dhurates nuk eshte valid.");
       }
+   });
+}
+
+// Function to add a product
+function addProductF(field) {
+   const dbRef = firebase.database().ref("stats/1/" + field);
+   dbRef.transaction((currentValue) => {
+      return (currentValue || 0) + 1;
+   });
+}
+
+// Function to remove a product
+function removeProductF(field) {
+   const dbRef = firebase.database().ref("stats/1/" + field);
+   dbRef.transaction((currentValue) => {
+      return (currentValue || 0) - 1;
    });
 }

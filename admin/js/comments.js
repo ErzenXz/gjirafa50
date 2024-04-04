@@ -1,280 +1,215 @@
+let userID = "";
+
 firebase.auth().onAuthStateChanged(function (user) {
-    if (user) {
-        // User is signed in.
-
-    } else {
-        // No user is signed in.
-        window.location.href = "login.html";
-    }
+   if (user) {
+      // User is signed in.
+      userID = user.uid;
+   } else {
+      // No user is signed in.
+      window.location.href = "login.html";
+   }
 });
 
+// Get all orders from Realtime Database
 
-// Get the modal element
-var modal = document.getElementById('editModal');
+let db = firebase.database();
+let ref = db.ref("orders");
 
-// Get the close button for the modal
-var closeBtn = document.getElementsByClassName('close')[0];
+ref.on("value", function (snapshot) {
+   let data = snapshot.val();
+   let orders = [];
+   for (let key in data) {
+      let order = data[key];
+      order.id = key;
+      orders.push(order);
+   }
 
-// Get the form for editing comments
-var editForm = document.getElementById('editForm');
-var editNameInput = document.getElementById('editName');
-var editCommentInput = document.getElementById('editComment');
-var editImageInput = document.getElementById('editImage');
-
-// Variables to store the postId and commentId for editing
-var editPostId = '';
-var editCommentId = '';
-
-// Function to open the modal for editing the comment
-function openEditModal(postId, commentId, name, comment, image) {
-    editPostId = postId;
-    editCommentId = commentId;
-
-    editNameInput.value = name;
-    editCommentInput.value = comment;
-    editImageInput.value = image;
-
-    modal.style.display = 'block';
-}
-
-// Function to close the modal
-function closeModal() {
-    modal.style.display = 'none';
-}
-
-// Event listener for the close button
-closeBtn.addEventListener('click', closeModal);
-
-// Event listener for form submission to update the comment
-editForm.addEventListener('submit', function (event) {
-    event.preventDefault();
-
-    // Get the updated values from the form inputs
-    var updatedName = editNameInput.value;
-    var updatedComment = editCommentInput.value;
-    var updatedImage = editImageInput.value;
-
-    // Call the updateComment function to update the comment
-    updateComment(editPostId, editCommentId, updatedName, updatedComment, updatedImage);
-
-    // Close the modal after updating the comment
-    closeModal();
+   // Display orders
+   displayOrders(orders);
 });
 
+function displayOrders(orders) {
+   let ordersTable = document.getElementById("ordersTable");
+   ordersTable.innerHTML = "";
 
-
-function getPostIds() {
-    var postIdsRef = firebase.database().ref('comments');
-
-    postIdsRef.on('value', function (snapshot) {
-        var postIds = snapshot.val();
-        var postIdsList = document.getElementById('post-ids');
-        // Clear the existing postIds list
-        postIdsList.innerHTML = '';
-
-        if (postIds) {
-            // Iterate over each postId and display it
-            for (var postId in postIds) {
-                var postIdElement = document.createElement('li');
-                postIdElement.textContent = postId;
-
-                postIdElement.addEventListener('click', function () {
-                    // Retrieve comments for the selected postId
-                    var selectedPostId = this.textContent;
-                    getCommentsByPostId(selectedPostId);
-                });
-
-                // Append the postId element to the list
-                postIdsList.appendChild(postIdElement);
-            }
-        } else {
-            console.log('No post IDs found.');
-        }
-    }, function (error) {
-        console.log('Error retrieving post IDs:', error);
-    });
+   orders.forEach(function (order) {
+      let tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${order.status}</td>
+            <td>${order.id}</td>
+            <td>${order.address}</td>
+            <td>${order.phone}</td>
+            <td>
+                <button onclick="viewOrder('${order.id}')" class="btn btn-primary">View</button>
+                <button onclick="deleteOrder('${order.id}')" class="btn btn-danger">Delete</button>
+            </td>
+        `;
+      ordersTable.appendChild(tr);
+   });
 }
 
-function getCommentsByPostId(postId) {
-    var commentsRef = firebase.database().ref('comments/' + postId);
+function viewOrder(orderID) {
+   let modal = document.createElement("div");
+   modal.className = "modal";
+   modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+            <h2>Order Details</h2>
+            <p><strong>Order ID:</strong> <span id="orderID"></span></p>
+            <p><strong>Status:</strong> <span id="orderStatus"></span></p>
+            <p><strong>Address:</strong> <span id="orderAddress"></span></p>
+            <p><strong>Phone:</strong> <span id="orderPhone"></span></p>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="orderItemsTable"></tbody>
+            </table>
 
-    commentsRef.on('value', function (snapshot) {
-        var comments = snapshot.val();
-        var commentsContainer = document.getElementById('comments-container');
+            <div class="actions">
+            <button class="btn btn-primary" onclick="approveOrder('${orderID}')">Approve</button>
+            <button class="btn btn-danger" onclick="rejectOrder('${orderID}')">Reject</button>
+            <button class="btn btn-secondary" onclick="refundOrder('${orderID}')">Refund</button>
+            <button class="btn btn-secondary" onclick="completeOrder('${orderID}')">Order Completed</button>
+            </div>
+        </div>
+    `;
 
-        // Clear the existing comments on the page
-        commentsContainer.innerHTML = '';
+   document.body.appendChild(modal);
 
-        if (comments) {
-            // Iterate over each comment and display it
-            for (var commentId in comments) {
-                var commentData = comments[commentId];
-                var commentElement = document.createElement('div');
-                commentElement.classList.add('comment');
+   // Get order from orders collection
+   let orderRef = db.ref("orders/" + orderID);
+   orderRef.once("value", function (snapshot) {
+      let order = snapshot.val();
+      document.getElementById("orderID").textContent = orderID;
+      document.getElementById("orderStatus").textContent = order.status;
+      document.getElementById("orderAddress").textContent = order.address;
+      document.getElementById("orderPhone").textContent = order.phone;
+   });
 
-                console.log(commentData);
-                var commentImage = '';
-                if (commentData.image) {
-                    commentImage = `<img width="35px" height="35px" src="${commentData.image}" alt="${commentData.image}">`;
-                }
-                let buttons = document.createElement('div');
-                buttons.classList.add('buttons');
-
-                commentElement.innerHTML = `
-                    <div class="comment-image">
-                        ${commentImage} <strong>${commentData.name}</strong>
-                    </div>
-                    <div class="comment-content">
-                        <p>${commentData.comment}</p>
-                    </div>
+   // Get order items from orderItems collection
+   let orderItemsRef = db.ref("orderItems/" + orderID);
+   orderItemsRef.once("value", function (snapshot) {
+      let orderItems = snapshot.val();
+      let orderItemsTable = document.getElementById("orderItemsTable");
+      orderItemsTable.innerHTML = "";
+      orderItems.forEach(function (item) {
+         let tr = document.createElement("tr");
+         tr.innerHTML = `
+                <td><a target="_blank" href="${location.origin}/product.html?product=${
+            item.product
+         }">View ${item.product}</a></td>
+                <td>${item.price}</td>
+                <td>${item.quantity}</td>
+                <td>${item.price * item.quantity}</td>
                 `;
-
-
-                var editButton = document.createElement('button');
-                editButton.textContent = 'Edit';
-                editButton.addEventListener('click', function (postId, commentId, name, comment, image) {
-                    return function () {
-                        // Open modal for editing the comment
-                        openEditModal(postId, commentId, name, comment, image);
-                    };
-                }(postId, commentId, commentData.name, commentData.comment, commentData.image));
-
-
-                var deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-
-                deleteButton.addEventListener('click', function (postId, commentId) {
-
-                    return function () {
-                        // Open modal for editing the comment
-                        console.log('Deleting comment:', postId + "/" + commentId)
-                        if (confirm("Are you sure you want to delete this comment?")) {
-
-                            deleteComment(postId, commentId);
-                        }
-                    };
-
-                }(postId, commentId, commentData.name, commentData.comment, commentData.image));
-
-
-                buttons.appendChild(editButton);
-                buttons.appendChild(deleteButton);
-                commentElement.appendChild(buttons);
-
-                commentsContainer.appendChild(commentElement);
-            }
-        } else {
-            toast('No comments found for the postId:', postId);
-        }
-    }, function (error) {
-        toast('Error retrieving comments:', error);
-    });
+         orderItemsTable.appendChild(tr);
+      });
+   });
 }
 
-function updateComment(postId, commentId, updatedName, updatedComment, updatedImage) {
-    var commentRef = firebase.database().ref('comments/' + postId + '/' + commentId);
-    // Update the comment data in the database
-    commentRef.update({
-        name: updatedName,
-        comment: updatedComment,
-        image: updatedImage
-    })
-        .then(function () {
-            toast('Comment updated successfully!');
-        })
-        .catch(function (error) {
-            toast('Error updating comment:', error);
-        });
+function deleteOrder(orderID) {
+   if (confirm("Are you sure you want to delete this order?")) {
+      db.ref("orders/" + orderID).remove();
+      db.ref("orderItems/" + orderID).remove();
+      toast("Order deleted successfully");
+   }
 }
 
-
-function deleteComment(postId, commentId) {
-    var commentRef = firebase.database().ref('comments/' + postId + '/' + commentId);
-
-    // Remove the comment from the database
-    commentRef.remove()
-        .then(function () {
-            toast('Comment deleted successfully!');
-            decreaseComment();
-        })
-        .catch(function (error) {
-            toast('Error deleting comment:', error);
-        });
+function approveOrder(orderID) {
+   db.ref("orders/" + orderID).update({ status: "Approved" });
+   toast("Order approved successfully");
+   removeProductF("activeOrders");
 }
 
+function rejectOrder(orderID) {
+   db.ref("orders/" + orderID).update({ status: "Rejected" });
+   toast("Order rejected successfully");
+   removeProductF("activeOrders");
+}
+
+function refundOrder(orderID) {
+   db.ref("orders/" + orderID).update({ status: "Refunded" });
+   toast("Order refunded successfully");
+   removeProductF("activeOrders");
+}
+
+function completeOrder(orderID) {
+   db.ref("orders/" + orderID).update({ status: "Completed" });
+   toast("Order completed successfully");
+   removeProductF("activeOrders");
+}
 
 function toast(message, duration = 4500, delay = 0) {
+   // Check for existing toast class elements
 
-    // Check for existing toast class elements
+   const existingToast = document.querySelector(".toast5");
 
-    const existingToast = document.querySelector('.toast5');
+   if (existingToast) {
+      existingToast.remove();
+   }
 
-    if (existingToast) {
-        existingToast.remove();
-    }
+   const toastContainer = document.createElement("div");
+   toastContainer.style.position = "fixed";
+   toastContainer.style.top = "1rem";
+   toastContainer.style.right = "1rem";
+   toastContainer.style.display = "flex";
+   toastContainer.style.alignItems = "center";
+   toastContainer.style.justifyContent = "center";
+   toastContainer.style.width = "16rem";
+   toastContainer.style.padding = "1rem";
+   toastContainer.style.backgroundColor = "#1F2937";
+   toastContainer.style.color = "#FFF";
+   toastContainer.style.borderRadius = "0.25rem";
+   toastContainer.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.25)";
+   toastContainer.style.overflow = "auto";
+   toastContainer.style.maxHeight = "500px";
+   toastContainer.style.minWidth = "200px";
+   toastContainer.style.width = "fit-content";
+   toastContainer.style.zIndex = "9999";
+   toastContainer.setAttribute("class", "toast5");
 
+   const toastText = document.createElement("span");
+   toastText.style.whiteSpace = "nowrap";
+   toastText.style.overflow = "hidden";
+   toastText.style.textOverflow = "ellipsis";
+   toastText.textContent = message;
+   toastContainer.appendChild(toastText);
 
-    const toastContainer = document.createElement('div');
-    toastContainer.style.position = 'fixed';
-    toastContainer.style.top = '1rem';
-    toastContainer.style.right = '1rem';
-    toastContainer.style.display = 'flex';
-    toastContainer.style.alignItems = 'center';
-    toastContainer.style.justifyContent = 'center';
-    toastContainer.style.width = '16rem';
-    toastContainer.style.padding = '1rem';
-    toastContainer.style.backgroundColor = '#1F2937';
-    toastContainer.style.color = '#FFF';
-    toastContainer.style.borderRadius = '0.25rem';
-    toastContainer.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.25)';
-    toastContainer.style.overflow = 'auto';
-    toastContainer.style.maxHeight = '500px';
-    toastContainer.style.minWidth = '200px';
-    toastContainer.style.width = 'fit-content';
-    toastContainer.style.zIndex = '9999';
-    toastContainer.setAttribute('class', 'toast5');
+   document.body.appendChild(toastContainer);
 
-    const toastText = document.createElement('span');
-    toastText.style.whiteSpace = 'nowrap';
-    toastText.style.overflow = 'hidden';
-    toastText.style.textOverflow = 'ellipsis';
-    toastText.textContent = message;
-    toastContainer.appendChild(toastText);
+   setTimeout(() => {
+      toastContainer.style.opacity = "0";
+      setTimeout(() => {
+         toastContainer.remove();
+      }, 300);
+   }, duration + delay);
 
-    document.body.appendChild(toastContainer);
-
-    setTimeout(() => {
-        toastContainer.style.opacity = '0';
-        setTimeout(() => {
-            toastContainer.remove();
-        }, 300);
-    }, duration + delay);
-
-    toast.dismiss = function () {
-        toastContainer.style.opacity = '0';
-        setTimeout(() => {
-            toastContainer.remove();
-        }, 300);
-    };
+   toast.dismiss = function () {
+      toastContainer.style.opacity = "0";
+      setTimeout(() => {
+         toastContainer.remove();
+      }, 300);
+   };
 }
 
-function decreaseComment() {
-    let blogRef = firebase.firestore().collection("stats").doc("1");
-
-    // Use Firestore's FieldValue.increment() with a negative value to decrement the view count
-    blogRef.update({
-        comments: firebase.firestore.FieldValue.increment(-1)
-    })
-        .then(function () {
-            console.log("View count decremented successfully!");
-        })
-        .catch(function (error) {
-            console.error("Error decrementing view count: ", error);
-        });
+// Function to add a product
+function addProductF(field) {
+   const dbRef = firebase.database().ref("stats/1/" + field);
+   dbRef.transaction((currentValue) => {
+      return (currentValue || 0) + 1;
+   });
 }
 
-
-
-// Calling function
-
-getPostIds();
+// Function to remove a product
+function removeProductF(field) {
+   const dbRef = firebase.database().ref("stats/1/" + field);
+   dbRef.transaction((currentValue) => {
+      return (currentValue || 0) - 1;
+   });
+}

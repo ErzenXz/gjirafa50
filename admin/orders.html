@@ -4,7 +4,7 @@
    <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <title>Admin • Manage Posts</title>
+      <title>Admin • Comments</title>
 
       <!-- Google Font: Source Sans Pro -->
       <link
@@ -15,7 +15,7 @@
       <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css" />
       <!-- Theme style -->
       <link rel="stylesheet" href="dist/css/adminlte.min.css" />
-      <link rel="stylesheet" href="dist/css/manage.css" />
+      <link rel="stylesheet" href="dist/css/comments.css" />
    </head>
 
    <body class="hold-transition sidebar-mini">
@@ -33,7 +33,7 @@
                   <a href="index.html" class="nav-link">Home</a>
                </li>
                <li class="nav-item d-none d-sm-inline-block">
-                  <a href="create.html" class="nav-link">New Product</a>
+                  <a href="create.html" class="nav-link">New Post</a>
                </li>
             </ul>
 
@@ -156,7 +156,7 @@
                               </a>
                            </li>
                            <li class="nav-item">
-                              <a href="manage.html" class="nav-link active">
+                              <a href="manage.html" class="nav-link">
                                  <i class="far fa-circle nav-icon"></i>
                                  <p>Manage Products</p>
                               </a>
@@ -179,7 +179,7 @@
                      </li>
 
                      <li class="nav-item">
-                        <a href="orders.html" class="nav-link">
+                        <a href="orders.html" class="nav-link active">
                            <i class="nav-icon fas fa-chart-line"></i>
                            <p>Orders</p>
                         </a>
@@ -206,10 +206,7 @@
                   <div class="row mb-2">
                      <div class="col-sm-6">
                         <div class="new">
-                           <h1 class="m-0">Manage Products</h1>
-                           <span>
-                              <a class="m-0" href="create.html">New Product</a>
-                           </span>
+                           <h1 class="m-0">Orders</h1>
                         </div>
                      </div>
                      <!-- /.col -->
@@ -227,9 +224,22 @@
             <!-- Main content -->
 
             <div class="container-fluid">
-               <div id="postsContainer"></div>
-               <br /><br />
-               <button id="loadMoreButton" class="buttonA">Load more</button>
+               <div class="container">
+                  <div id="orders">
+                     <table class="tb">
+                        <thead>
+                           <tr>
+                              <th>Status</th>
+                              <th>Order ID</th>
+                              <th>Address</th>
+                              <th>Customer Phone</th>
+                              <th>Action</th>
+                           </tr>
+                        </thead>
+                        <tbody id="ordersTable"></tbody>
+                     </table>
+                  </div>
+               </div>
                <br />
             </div>
          </div>
@@ -254,6 +264,7 @@
             rights reserved.
          </footer>
       </div>
+
       <!-- ./wrapper -->
 
       <!-- REQUIRED SCRIPTS -->
@@ -268,14 +279,13 @@
       <script src="plugins/chart.js/Chart.min.js"></script>
 
       <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-app.min.js"></script>
-
       <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
       <script
          defer
          src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-auth.min.js"
       ></script>
 
-      <script defer src="js/manage.js"></script>
       <script>
          const firebaseConfig = {
             apiKey: "AIzaSyBikfDUXZu0yRmfrOPEXWgQ0fb77jZe4f4",
@@ -290,5 +300,6 @@
 
          firebase.initializeApp(firebaseConfig);
       </script>
+      <script defer src="js/comments.js"></script>
    </body>
 </html>

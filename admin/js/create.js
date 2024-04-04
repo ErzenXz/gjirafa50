@@ -102,7 +102,7 @@ function addPost() {
       "?",
       "?",
       "?",
-      endData,
+      new Date(endData).getTime(),
       searchIndex
    );
 }

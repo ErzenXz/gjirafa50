@@ -4,7 +4,7 @@ let products = database.ref("products");
 
 let urlParams = new URLSearchParams(window.location.search);
 let categoryParam = urlParams.get("category");
-let searchParam = urlParams.get("search");
+let searchParam = urlParams.get("search") || urlParams.get("query");
 
 // Get the last 30 products from the database, if user clicks on the "View More" button, get the next 30 products
 
@@ -576,5 +576,22 @@ if (categoryParam) {
 // Get the search query from the URL and search for products by name
 
 if (searchParam) {
-   searchProducts(searchParam);
+   document.getElementById("loading").classList.remove("hidden");
+   let allSearchDone = doneGettingProducts;
+
+   let checkSearchDone = setInterval(() => {
+      if (doneGettingProducts) {
+         clearInterval(checkSearchDone);
+         allSearchDone = true;
+         console.log("Search index is ready!");
+         searchProducts(searchParam);
+         document.getElementById("loading").classList.add("hidden");
+      }
+   }, 100);
+
+   setTimeout(() => {
+      if (!allSearchDone) {
+         console.log("Search index is still being prepared...");
+      }
+   }, 5000);
 }
