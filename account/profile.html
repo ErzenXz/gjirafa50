@@ -5,10 +5,16 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>eTapQuiz • Account</title>
 
-      <link rel="stylesheet" href="../style.css" />
+      <link rel="stylesheet" href="../css/style.css" />
+      <link rel="stylesheet" href="../css/profile.css" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-      <link href="../fonts/fonts-min.css" rel="stylesheet" />
+      <link
+         href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Space+Grotesk:wght@300..700&display=swap"
+         rel="stylesheet"
+      />
+
+      <script defer src="https://kit.fontawesome.com/f45cd9c28c.js"></script>
 
       <script
          defer
@@ -25,28 +31,57 @@
          crossorigin="anonymous"
          referrerpolicy="no-referrer"
       ></script>
-
-      <script defer src="https://kit.fontawesome.com/f45cd9c28c.js"></script>
-      <div id="victoryAA"></div>
    </head>
    <body>
       <div class="loading-screen" id="loading">
          <div class="loading-spinner"></div>
       </div>
+
       <div class="nav" id="nav2">
-         <div class="nav__logo">eTapQuiz</div>
-         <div class="nav__links" id="navLinks">
-            <a href="../index.html">Home</a>
-            <a href="../browse.html">Explore</a>
-            <a href="../create.html">Create</a>
-            <a href="../about.html">About</a>
-            <a href="profile.html" class="active">Account</a>
+         <div class="navs">
+            <div class="nav__logo">Trendy</div>
+            <div class="nav__links" id="navLinks">
+               <a href="index.html" class="active">
+                  <!-- <i class="fa-solid fa-house"></i> -->
+                  <p>Home</p></a
+               >
+               <a href="browse.html?category=teknologji">
+                  <!-- <i class="fa-solid fa-shop"></i> -->
+                  <p>Teknologji</p></a
+               >
+               <a href="browse.html?category=veshje">
+                  <!-- <i class="fa-solid fa-cart-shopping"></i> -->
+                  <p>Veshje</p></a
+               >
+               <a href="browse.html?category=shtepi">
+                  <!-- <i class="fa-solid fa-cart-shopping"></i> -->
+                  <p>Shtëpi</p></a
+               >
+               <a href="browse.html?category=sport">
+                  <!-- <i class="fa-solid fa-cart-shopping"></i> -->
+                  <p>Sport</p></a
+               >
+               <a href="browse.html?category=natyre">
+                  <!-- <i class="fa-solid fa-cart-shopping"></i> -->
+                  <p>Natyre</p></a
+               >
+            </div>
          </div>
          <div class="nav__auth" id="navAuth">
+            <span id="search">
+               <i class="fa-solid fa-search"></i>
+            </span>
             <span id="theme-switcher"><i class="fa-solid fa-moon"></i></span>
-            <span id="logout" onclick="logOut()"
+            <span id="cart" onclick="openCart()">
+               <i class="fa-solid fa-cart-shopping"></i>
+               <span id="numberCart">0</span>
+            </span>
+            <span id="account">
+               <i class="fa-solid fa-user"></i>
+            </span>
+            <!-- <span id="logout" onclick="logOut()"
                ><i class="fa-solid fa-right-from-bracket"></i
-            ></span>
+            ></span> -->
          </div>
          <div class="nav__burger" onclick="toggleMenu()">
             <div class="burger-line"></div>
@@ -109,37 +144,6 @@
          referrerpolicy="no-referrer"
       ></script>
 
-      <script>
-         // Your web app's Firebase configuration
-         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-         const firebaseConfig = {
-            apiKey: "AIzaSyBfxhlQ5c8sk_SHKJTvQ6tWPdzVAt4PBSA",
-            authDomain: "tapquiz-571c1.firebaseapp.com",
-            databaseURL: "https://tapquiz-571c1-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "tapquiz-571c1",
-            storageBucket: "tapquiz-571c1.appspot.com",
-            messagingSenderId: "270518942009",
-            appId: "1:270518942009:web:44a9a6c1de48fe403550e8",
-            measurementId: "G-QRTCR1G4GB",
-         };
-         // Initialize Firebase
-         firebase.initializeApp(firebaseConfig);
-      </script>
-
-      <div id="victoryS">
-         <div class="victory"></div>
-         <div class="imposter">
-            <div class="spacesuit">
-               <div class="chest-and-head"></div>
-               <div class="legs"></div>
-               <div class="arm"></div>
-               <div class="helmet-glass"></div>
-            </div>
-         </div>
-         <div class="background"></div>
-         <div class="name"></div>
-      </div>
-
       <style>
          main {
             margin-bottom: 80px;
@@ -183,8 +187,29 @@
          });
       </script>
 
+      <script>
+         const firebaseConfig = {
+            apiKey: "AIzaSyBikfDUXZu0yRmfrOPEXWgQ0fb77jZe4f4",
+            authDomain: "gjirafa50-f45d8.firebaseapp.com",
+            databaseURL: "https://gjirafa50-f45d8-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "gjirafa50-f45d8",
+            storageBucket: "gjirafa50-f45d8.appspot.com",
+            messagingSenderId: "470691065240",
+            appId: "1:470691065240:web:e8eb6b827707b5be98cfed",
+            measurementId: "G-PKVM99DBS5",
+         };
+
+         firebase.initializeApp(firebaseConfig);
+      </script>
+
+      <script
+         defer
+         src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-database.js"
+      ></script>
+
+      <script defer src="../js/authcheck.js"></script>
+      <script src="../js/theme.js"></script>
+
       <script src="profile.js" defer></script>
-      <script src="../theme.js"></script>
-      <script src="../authcheck.js" defer></script>
    </body>
 </html>

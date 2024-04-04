@@ -6,7 +6,7 @@
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 20px;
 }
 
@@ -68,6 +68,31 @@
 .post-button:hover {
     background-color: #e0e0e0;
 }
+
+.smallImages {
+    display: flex;
+    gap: 10px;
+}
+
+.smallImages img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+button {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+button:not(:last-child) {
+    margin-right: 10px;
+}
+
+
 
 .popup {
     position: fixed;
@@ -156,4 +181,84 @@
     align-items: center;
     flex-direction: row;
     gap: 70px;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    color: #888;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #555;
+}
+
+.modal h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.modal label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.modal input,
+.modal textarea {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.modal button {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.modal button:not(:last-child) {
+    margin-right: 10px;
+}
+
+/* Modern Bootstap look for inputs */
+
+.modal input,
+.modal textarea {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.modal input:focus,
+.modal textarea:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }

@@ -244,9 +244,11 @@
     transform: scale(0.95);
 }
 
-.product__button:nth-child(even) {
+
+.product__button:last-child {
     margin-left: 10px;
-    background-color: var(--btn);
+    background-color: var(--btn2);
+    color: var(--text);
 }
 
 .product__mini__info {

@@ -35,3 +35,21 @@ function logOut() {
 function goLogin() {
    location.href = "./account/index.html";
 }
+
+// Function to add a product
+function addProductF(field) {
+   const dbRef = firebase.database().ref("stats/1/" + field);
+   dbRef.transaction((currentValue) => {
+      return (currentValue || 0) + 1;
+   });
+}
+
+// Function to remove a product
+function removeProductF(field) {
+   const dbRef = firebase.database().ref("stats/1/" + field);
+   dbRef.transaction((currentValue) => {
+      return (currentValue || 0) - 1;
+   });
+}
+
+addProductF("visits");
