@@ -1,0 +1,35 @@
+.hidden {
+    display: none;
+}
+
+.postData {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Button Styles */
+
+/* Path: dist\css\create.css */
+
+.buttonA {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3574f1;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.buttonA:hover {
+    background-color: #3574f1b7;
+    color: white;
+}
+
+.buttonA:active {
+    background-color: #2564e3;
+    color: white;
+}

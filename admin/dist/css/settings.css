@@ -1,0 +1,70 @@
+#data {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+
+}
+
+#settings {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#data button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#data button:hover {
+    background-color: #45a049;
+}
+
+#data button:active {
+    background-color: #45a049;
+    transform: translateY(4px);
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper input {
+    border: none;
+    border-bottom: 2px solid #ccc;
+    padding: 10px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    width: 100%;
+}
+
+.input-wrapper label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #999;
+    transition: top 0.3s ease, font-size 0.3s ease, color 0.3s ease;
+}
+
+.input-wrapper input:focus {
+    border-color: #00bcd4;
+}
+
+.input-wrapper input:focus+label,
+.input-wrapper input:not(:placeholder-shown)+label {
+    top: -15px;
+    font-size: 12px;
+    color: #00bcd4;
+}
