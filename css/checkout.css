@@ -1,0 +1,215 @@
+.hidden {
+    display: none !important;
+}
+
+.cart {
+    width: 90%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 0 auto;
+    margin-top: 100px;
+    background-color: var(--secondary);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border);
+}
+
+.cart__items {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.cart__items .cart-item {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+}
+
+.cart__footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.cart__total {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 50px;
+}
+
+.cart__total p {
+    font-size: 2.2rem;
+}
+
+
+.cart__content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.cart__header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.person__address {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.person__address input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background-color: var(--inputBG);
+    color: var(--inputTXT);
+    outline: none;
+}
+
+.person__address input:focus {
+    border: 1px solid var(--btn3);
+}
+
+.person__address button {
+    background-color: var(--btn3);
+    border: none;
+    color: var(--textB);
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.person__address button:hover {
+    cursor: pointer;
+}
+
+.person__payment {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: 50px;
+}
+
+.payment__methods {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+}
+
+.payment__card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.payment__card input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background-color: var(--inputBG);
+    color: var(--inputTXT);
+    outline: none;
+
+}
+
+.payment__card input:focus {
+    border: 1px solid var(--btn3);
+}
+
+.gift__card {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    margin-top: 50px;
+}
+
+.gift__card input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background-color: var(--inputBG);
+    color: var(--inputTXT);
+    outline: none;
+}
+
+.gift__card input:focus {
+    border: 1px solid var(--btn3);
+}
+
+.gift__card button {
+    background-color: var(--btn3);
+    border: none;
+    color: var(--textB);
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.gift__card button:hover {
+    cursor: pointer;
+}
+
+.porosit__button {
+    background-color: var(--btn3);
+    border: none;
+    color: var(--textB);
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.porosit__button:hover {
+    background-color: var(--btn-hover3);
+}
+
+.porosit__button:active {
+    transform: scale(0.95);
+}
+
+#search:hover {
+    background-color: white;
+}
+
+#search input {
+    outline: none;
+    color: black;
+    border: none;
+    background-color: transparent;
+    font-size: 1rem;
+    transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
