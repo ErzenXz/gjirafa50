@@ -6,6 +6,14 @@ let urlParams = new URLSearchParams(window.location.search);
 let categoryParam = urlParams.get("category");
 let searchParam = urlParams.get("search") || urlParams.get("query");
 
+let userID = localStorage.getItem("userID");
+
+firebase.auth().onAuthStateChanged((user) => {
+   if (user) {
+      userID = user.uid;
+   }
+});
+
 // Get the last 30 products from the database, if user clicks on the "View More" button, get the next 30 products
 
 let lastKey = "";
@@ -594,4 +602,263 @@ if (searchParam) {
          console.log("Search index is still being prepared...");
       }
    }, 5000);
+}
+
+// Function to add a product to the cart
+
+function addToCart(productKey) {
+   let cartItem = {
+      product: productKey,
+      quantity: 1,
+      time: new Date().getTime(),
+      timestamp: firebase.database.ServerValue.TIMESTAMP,
+   };
+
+   // Check if the product is already in the cart
+   let cart = database.ref("cart/" + userID + "/" + productKey + "/");
+
+   cart.once("value", function (snapshot) {
+      let existingCartItem = snapshot.val();
+
+      if (existingCartItem) {
+         cartItem.quantity = existingCartItem.quantity + 1;
+         cartItem.time = new Date().getTime();
+         cartItem.timestamp = firebase.database.ServerValue.TIMESTAMP;
+
+         cart.set(cartItem).then(() => {
+            toast("Kuantitei i produktit u rrit me 1.");
+         });
+      } else {
+         cart.set(cartItem).then(() => {
+            toast("Produkti u shtua në shportë.");
+
+            document.getElementById("numberCart").textContent =
+               parseInt(document.getElementById("numberCart").textContent) + 1;
+         });
+      }
+   });
+}
+
+// Function to add a product to the wishlist
+
+function addToWishlist(productKey) {
+   let wishlistItem = {
+      product: productKey,
+      time: new Date().getTime(),
+      timestamp: firebase.database.ServerValue.TIMESTAMP,
+   };
+
+   // Check if the product is already in the wishlist
+   let wishlist = database.ref("wishlist/" + userID + "/" + productKey + "/");
+
+   wishlist.once("value", function (snapshot) {
+      let existingWishlistItem = snapshot.val();
+
+      if (existingWishlistItem) {
+         toast("Produkti është tashmë në listën e dëshirave.");
+      } else {
+         wishlist.set(wishlistItem).then(() => {
+            toast("Produkti u shtua në listën e dëshirave.");
+         });
+      }
+   });
+}
+
+// Function to remove a product from the cart
+
+function removeFromCart(cartKey) {
+   let cart = database.ref("cart/" + userID + "/" + cartKey);
+
+   cart
+      .remove()
+      .then(() => {
+         toast("Produkti u hoq nga shporta.");
+      })
+      .catch((error) => {
+         console.error("Error removing product from cart: ", error);
+      });
+}
+
+function openCart() {
+   let cartDiv = document.createElement("div");
+   cartDiv.className = "cart";
+   let cartContent = document.createElement("div");
+   cartContent.className = "cart-content";
+   let cartHeader = document.createElement("div");
+   cartHeader.className = "cart-header";
+   let cartTitle = document.createElement("h2");
+   cartTitle.textContent = "Shporta";
+   let closeCart = document.createElement("button");
+   closeCart.className = "close-cart";
+   closeCart.textContent = "Mbyll";
+   closeCart.addEventListener("click", function (event) {
+      document.getElementById("cart").classList.remove("hidden");
+      cartDiv.style.transform = "translateX(100%)";
+      setTimeout(() => {
+         cartDiv.remove();
+      }, 300);
+   });
+   cartHeader.appendChild(cartTitle);
+   cartHeader.appendChild(closeCart);
+   cartContent.appendChild(cartHeader);
+   let cartList = document.createElement("div");
+   cartList.className = "cart-list";
+   let cartFooter = document.createElement("div");
+   cartFooter.className = "cart-footer";
+   let cartTotalElement = document.createElement("h3");
+   cartTotalElement.textContent = "Totali: ";
+   let cartTotalPrice = document.createElement("span");
+   cartTotalPrice.id = "cartTotalPrice";
+   cartTotalPrice.textContent = "0.00 €";
+   cartTotalElement.appendChild(cartTotalPrice);
+   let checkoutButton = document.createElement("button");
+   checkoutButton.className = "checkout-button";
+   checkoutButton.textContent = "Blej";
+   checkoutButton.addEventListener("click", function (event) {
+      checkoutCart();
+   });
+   cartFooter.appendChild(cartTotalElement);
+   cartFooter.appendChild(checkoutButton);
+   cartContent.appendChild(cartList);
+   cartContent.appendChild(cartFooter);
+   cartDiv.appendChild(cartContent);
+   document.body.appendChild(cartDiv);
+
+   document.getElementById("cart").classList.add("hidden");
+   fillCart();
+}
+
+function fillCart() {
+   document.getElementsByClassName("cart")[0].style.transform = "translateX(0)";
+
+   let userCart = database.ref("cart/" + userID);
+   let cartItems = [];
+   let cartTotal = 0;
+   let cartList = document.querySelector(".cart-list");
+   let cartTotalPrice = document.getElementById("cartTotalPrice");
+   cartTotalPrice.textContent = "0.00 €";
+
+   userCart.on("value", function (snapshot) {
+      cartItems = [];
+      cartTotal = 0;
+      cartList.innerHTML = "";
+
+      snapshot.forEach(function (childSnapshot) {
+         let cartKey = childSnapshot.key;
+         let cartItem = childSnapshot.val();
+         cartItems.push(cartItem);
+         let product = products.child(cartItem.product);
+         product.once("value", function (snapshot) {
+            let productData = snapshot.val();
+            let price = Number(
+               productData.price - (productData.price * productData.discount) / 100
+            ).toFixed(2);
+            cartTotal += price * cartItem.quantity;
+            cartTotalPrice.textContent = cartTotal.toFixed(2) + " €";
+
+            document.getElementById("numberCart").textContent = cartTotal.toFixed(2) + " €";
+
+            let cartItemElement = document.createElement("div");
+            cartItemElement.className = "cart-item";
+            let cartItemName = document.createElement("h3");
+            cartItemName.textContent = productData.name;
+            cartItemName.style.cursor = "pointer";
+
+            cartItemName.addEventListener("click", function (event) {
+               location.href = "product?product=" + cartItem.product;
+            });
+
+            let actions = document.createElement("div");
+            actions.className = "actions";
+
+            let add1More = document.createElement("button");
+            add1More.textContent = "+";
+
+            add1More.addEventListener("click", function (event) {
+               cartItem.quantity++;
+               userCart.child(cartKey).set(cartItem);
+            });
+
+            let remove1 = document.createElement("button");
+            remove1.textContent = "-";
+            remove1.addEventListener("click", function (event) {
+               if (cartItem.quantity > 1) {
+                  cartItem.quantity--;
+                  userCart.child(cartKey).set(cartItem);
+               }
+            });
+
+            let cartItemPrice = document.createElement("span");
+            cartItemPrice.textContent = price + " €";
+            let cartItemQuantity = document.createElement("span");
+            cartItemQuantity.textContent = cartItem.quantity + "x";
+            let cartItemRemove = document.createElement("button");
+            cartItemRemove.textContent = "Fshij";
+            cartItemRemove.addEventListener("click", function (event) {
+               removeFromCart(cartKey);
+            });
+
+            actions.appendChild(cartItemPrice);
+            actions.appendChild(cartItemQuantity);
+            actions.appendChild(add1More);
+            actions.appendChild(remove1);
+            actions.appendChild(cartItemRemove);
+
+            cartItemElement.appendChild(cartItemName);
+            cartItemElement.appendChild(actions);
+            cartList.appendChild(cartItemElement);
+         });
+      });
+   });
+}
+
+function toast(message, duration = 4500, delay = 0) {
+   const existingToast = document.querySelector(".toast");
+   if (existingToast) {
+      existingToast.remove();
+   }
+   const toastContainer = document.createElement("div");
+   toastContainer.style.position = "fixed";
+   toastContainer.style.top = "1.5rem";
+   toastContainer.style.right = "1rem";
+   toastContainer.style.display = "flex";
+   toastContainer.style.alignItems = "center";
+   toastContainer.style.justifyContent = "center";
+   toastContainer.style.width = "16rem";
+   toastContainer.style.padding = "1rem";
+   toastContainer.style.backgroundColor = "rgba(243, 247, 253, 0.5)";
+   toastContainer.style.color = "#041e49";
+   toastContainer.style.borderRadius = "30px";
+   toastContainer.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.25)";
+   toastContainer.style.overflow = "auto";
+   toastContainer.style.maxHeight = "500px";
+   toastContainer.style.minWidth = "200px";
+   toastContainer.style.width = "fit-content";
+   toastContainer.style.zIndex = "9999";
+   toastContainer.style.transition = "opacity 0.3s ease-out";
+   toastContainer.style.backdropFilter = "blur(10px)";
+   toastContainer.setAttribute("class", "toast");
+   const toastText = document.createElement("span");
+   toastText.style.whiteSpace = "nowrap";
+   toastText.style.overflow = "hidden";
+   toastText.style.textOverflow = "ellipsis";
+   toastText.textContent = message;
+   toastContainer.appendChild(toastText);
+   document.body.appendChild(toastContainer);
+   setTimeout(() => {
+      toastContainer.style.opacity = "0";
+      setTimeout(() => {
+         toastContainer.remove();
+      }, 300);
+   }, duration + delay);
+   toast.dismiss = function () {
+      toastContainer.style.opacity = "0";
+      setTimeout(() => {
+         toastContainer.remove();
+      }, 300);
+   };
+}
+
+function checkoutCart() {
+   location.href = "checkout";
 }

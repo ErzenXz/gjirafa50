@@ -126,6 +126,10 @@ body {
 
    .nav__burger {
       display: block;
+      background-color: var(--navbar);
+      padding: 8px 15px;
+      border-radius: 10px;
+      border: 1px solid var(--border2);
    }
 
 
@@ -133,11 +137,15 @@ body {
       margin-bottom: 30px;
    }
 
+   .nav__logo {
+      display: none !important;
+   }
+
    .nav__links {
       display: none !important;
       flex-direction: column;
       position: absolute;
-      top: 50px;
+      top: 100px;
       left: 0;
       width: 100%;
       background-color: var(--body);
