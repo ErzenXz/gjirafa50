@@ -3,7 +3,7 @@
    <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>eTapQuiz • Account</title>
+      <title>Trendy • Account</title>
 
       <link rel="stylesheet" href="../css/style.css" />
       <link rel="stylesheet" href="../css/profile.css" />
@@ -26,6 +26,11 @@
 
       <script
          defer
+         src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-database.js"
+      ></script>
+
+      <script
+         defer
          src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-firestore.min.js"
          integrity="sha512-95HhZKEWw0vxywbO/5CJhf+KJqEDEmXGDeys3ylTMTuW50ccC26GcV7pPhTiYC8fH3jj0i4AwxRdIN5vfoLqmg=="
          crossorigin="anonymous"
@@ -41,44 +46,44 @@
          <div class="navs">
             <div class="nav__logo">Trendy</div>
             <div class="nav__links" id="navLinks">
-               <a href="index.html" class="active">
+               <a href="../index.html" class="active">
                   <!-- <i class="fa-solid fa-house"></i> -->
                   <p>Home</p></a
                >
-               <a href="browse.html?category=teknologji">
+               <a href="../browse.html?category=teknologji">
                   <!-- <i class="fa-solid fa-shop"></i> -->
                   <p>Teknologji</p></a
                >
-               <a href="browse.html?category=veshje">
+               <a href="../browse.html?category=veshje">
                   <!-- <i class="fa-solid fa-cart-shopping"></i> -->
                   <p>Veshje</p></a
                >
-               <a href="browse.html?category=shtepi">
+               <a href="../browse.html?category=shtepi">
                   <!-- <i class="fa-solid fa-cart-shopping"></i> -->
                   <p>Shtëpi</p></a
                >
-               <a href="browse.html?category=sport">
+               <a href="../browse.html?category=sport">
                   <!-- <i class="fa-solid fa-cart-shopping"></i> -->
                   <p>Sport</p></a
                >
-               <a href="browse.html?category=natyre">
+               <a href="../browse.html?category=natyre">
                   <!-- <i class="fa-solid fa-cart-shopping"></i> -->
                   <p>Natyre</p></a
                >
             </div>
          </div>
          <div class="nav__auth" id="navAuth">
-            <span id="search">
+            <!-- <span id="search">
                <i class="fa-solid fa-search"></i>
-            </span>
+            </span> -->
             <span id="theme-switcher"><i class="fa-solid fa-moon"></i></span>
-            <span id="cart" onclick="openCart()">
+            <!-- <span id="cart" onclick="openCart()">
                <i class="fa-solid fa-cart-shopping"></i>
                <span id="numberCart">0</span>
-            </span>
-            <span id="account">
+            </span> -->
+            <!-- <span id="account">
                <i class="fa-solid fa-user"></i>
-            </span>
+            </span> -->
             <!-- <span id="logout" onclick="logOut()"
                ><i class="fa-solid fa-right-from-bracket"></i
             ></span> -->
@@ -131,8 +136,27 @@
                </div>
             </div>
          </div>
+
+         <div id="orders1">
+            <h3>Orders</h3>
+            <div id="orders">
+               <table class="tb">
+                  <thead>
+                     <tr>
+                        <th>Status</th>
+                        <th>Order ID</th>
+                        <th>Address</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                     </tr>
+                  </thead>
+                  <tbody id="ordersTable"></tbody>
+               </table>
+            </div>
+         </div>
       </main>
 
+      <br /><br /><br /><br /><br />
       <footer>
          <p>Copyright 2024 - Erzen Krasniqi</p>
       </footer>
@@ -202,14 +226,8 @@
          firebase.initializeApp(firebaseConfig);
       </script>
 
-      <script
-         defer
-         src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-database.js"
-      ></script>
-
       <script defer src="../js/authcheck.js"></script>
       <script src="../js/theme.js"></script>
-
-      <script src="profile.js" defer></script>
+      <script src="./profile.js" defer></script>
    </body>
 </html>

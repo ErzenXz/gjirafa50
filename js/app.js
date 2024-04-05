@@ -29,6 +29,58 @@ function updateSlide() {
    totalSlidesElement.textContent = slides.length;
 }
 
+// slidesContainer.addEventListener("mousedown", (event) => {
+//    isDragging = true;
+//    startPosX = event.clientX;
+//    prevTranslateX = currentTranslateX;
+//    slidesContainer.style.transition = "none";
+// });
+
+// slidesContainer.addEventListener("mousemove", (event) => {
+//    if (isDragging) {
+//       const currentPositionX = event.clientX;
+//       currentTranslateX = prevTranslateX + currentPositionX - startPosX;
+//       slidesContainer.style.transform = `translateX(${currentTranslateX}px)`;
+//    }
+// });
+
+// slidesContainer.addEventListener("mouseup", () => {
+//    isDragging = false;
+//    const movedBy = currentTranslateX - prevTranslateX;
+//    if (movedBy < -100 && currentSlideIndex < slides.length - 1) {
+//       currentSlideIndex += 1;
+//    }
+//    if (movedBy > 100 && currentSlideIndex > 0) {
+//       currentSlideIndex -= 1;
+//    }
+//    slidesContainer.style.transition = "transform 0.3s ease-out";
+//    slidesContainer.style.transform = `translateX(-${currentSlideIndex * slides[0].offsetWidth}px)`;
+// });
+
+// slidesContainer.addEventListener("transitionend", () => {
+//    updateSlide();
+// });
+
+// slidesContainer.addEventListener("mouseleave", () => {
+//    isDragging = false;
+//    const movedBy = currentTranslateX - prevTranslateX;
+//    if (movedBy < -100 && currentSlideIndex < slides.length - 1) {
+//       currentSlideIndex += 1;
+//    }
+//    if (movedBy > 100 && currentSlideIndex > 0) {
+//       currentSlideIndex -= 1;
+//    }
+//    slidesContainer.style.transition = "transform 0.3s ease-out";
+//    slidesContainer.style.transform = `translateX(-${currentSlideIndex * slides[0].offsetWidth}px)`;
+// });
+
+// Auto slide
+
+let autoSlide = setInterval(() => {
+   currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+   updateSlide();
+}, 5000);
+
 let search = document.getElementById("search");
 let oldSearch = `<i class="fa-solid fa-search"></i>`;
 let oldSearchBar = `<input type="text" id="searchBar" placeholder="Search..." class="searchBar">`;

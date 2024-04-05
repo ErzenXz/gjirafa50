@@ -32,7 +32,6 @@
 
    --body: #f5f7fa;
 }
-
 body {
    background-color: var(--body);
 }

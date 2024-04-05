@@ -3,6 +3,8 @@ firebase.auth().useDeviceLanguage();
 firebase.auth().onAuthStateChanged((user) => {
    if (user) {
       console.log("User is logged in!");
+      document.getElementById("account").innerHTML = `<i class="fa-solid fa-user"></i>`;
+      document.getElementById("account").setAttribute("onclick", "goProfile()");
    } else {
       console.log("User is not logged in!");
 
@@ -53,3 +55,7 @@ function removeProductF(field) {
 }
 
 addProductF("visits");
+
+function goProfile() {
+   location.href = "./account/profile.html";
+}
